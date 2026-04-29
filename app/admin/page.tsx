@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Package, CheckCircle, AlertCircle, Activity } from "lucide-react"
 import { AdminCard } from "@/components/admin-card"
 import { RecentParcels } from "@/components/recent-parcels"
+import { DashboardStatsSkeleton } from "@/components/skeleton-loader"
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -41,12 +42,16 @@ export default function AdminDashboard() {
       <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <AdminCard icon={Package} title="Active Parcels" value={stats.activeParcels} color="text-primary" />
-        <AdminCard icon={CheckCircle} title="Delivered" value={stats.deliveredParcels} color="text-secondary" />
-        <AdminCard icon={AlertCircle} title="Delayed" value={stats.delayedParcels} color="text-red-500" />
-        <AdminCard icon={Activity} title="System Health" value="100%" color="text-green-500" />
-      </div>
+      {loading ? (
+        <DashboardStatsSkeleton />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <AdminCard icon={Package} title="Active Parcels" value={stats.activeParcels} color="text-primary" />
+          <AdminCard icon={CheckCircle} title="Delivered" value={stats.deliveredParcels} color="text-secondary" />
+          <AdminCard icon={AlertCircle} title="Delayed" value={stats.delayedParcels} color="text-red-500" />
+          <AdminCard icon={Activity} title="System Health" value="100%" color="text-green-500" />
+        </div>
+      )}
 
       {/* Recent Parcels */}
       <RecentParcels />

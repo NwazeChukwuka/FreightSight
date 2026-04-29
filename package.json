@@ -5,11 +5,26 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:prod": "node scripts/build-production.js build",
+    "build:analyze": "node scripts/build-production.js analyze",
     "start": "next start",
     "server": "nodemon server.js",
+    "server:prod": "node server-ssl.js",
+    "backup": "node scripts/backup.js",
+    "backup:full": "node scripts/backup.js full",
+    "backup:schedule": "node scripts/backup.js schedule",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next dist build logs",
+    "deploy": "npm run build:prod && npm run backup:full",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:stop": "pm2 stop freightSight",
+    "pm2:restart": "pm2 restart freightSight",
+    "pm2:logs": "pm2 logs freightSight"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.4",
@@ -53,6 +68,15 @@
     "supertest": "^6.3.3",
     "tailwindcss": "^4.1.9",
     "typescript": "^5",
-    "vitest": "^1.0.4"
+    "vitest": "^1.0.4",
+    "@next/bundle-analyzer": "^14.0.4",
+    "compression-webpack-plugin": "^10.0.0",
+    "webpack-bundle-analyzer": "^4.9.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.0.4"
+  },
+  "optionalDependencies": {
+    "aws-sdk": "^2.1500.0",
+    "pm2": "^5.3.0"
   }
 }

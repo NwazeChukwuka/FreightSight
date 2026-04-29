@@ -61,7 +61,7 @@ export default function Home() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ 
-            backgroundImage: "url(https://images.unsplash.com/photo-1605699374268-825ee8a5d62c?w=1920&q=80)",
+            backgroundImage: "url(https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80)",
             transform: `translateY(${scrollY * 0.3}px)`
           }}
         />
@@ -265,7 +265,7 @@ export default function Home() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ 
-            backgroundImage: "url(https://images.unsplash.com/photo-1578597561984-91d4db4c6b9f?w=1920&q=80)"
+            backgroundImage: "url(https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80)"
           }}
         />
         

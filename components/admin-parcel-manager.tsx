@@ -2,12 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { Search, Plus, Edit, Trash2, Clock, MapPin, Package, Calendar, Bell, Settings } from "lucide-react"
+import { ExportButtons } from "./export-buttons"
+import { AdvancedFilters } from "./advanced-filters"
+import { ParcelCardSkeleton, SearchSkeleton } from "./skeleton-loader"
 
 interface Parcel {
   _id: string
   trackingId: string
   courier: string
   status: string
+  weight?: string
+  dimensions?: string
+  contents?: string
   sender: {
     name: string
     email: string
@@ -68,6 +74,25 @@ export function AdminParcelManager() {
   const [showScheduledForm, setShowScheduledForm] = useState(false)
   const [showParcelForm, setShowParcelForm] = useState(false)
   const [activeTab, setActiveTab] = useState("parcels")
+  const [advancedFilters, setAdvancedFilters] = useState<{
+    status: string[]
+    courier: string[]
+    dateRange: { start: string; end: string }
+    weightRange: { min: string; max: string }
+    location: string
+    senderName: string
+    receiverName: string
+    trackingId: string
+  }>({
+    status: [],
+    courier: [],
+    dateRange: { start: "", end: "" },
+    weightRange: { min: "", max: "" },
+    location: "",
+    senderName: "",
+    receiverName: "",
+    trackingId: ""
+  })
 
   useEffect(() => {
     fetchParcels()
@@ -105,12 +130,78 @@ export function AdminParcelManager() {
   }
 
   const filteredParcels = parcels.filter(parcel => {
-    const matchesSearch = parcel.trackingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         parcel.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         parcel.receiver.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // Basic search
+    const matchesSearch = searchTerm === "" || 
+      parcel.trackingId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      parcel.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      parcel.receiver.name.toLowerCase().includes(searchTerm.toLowerCase())
+
+    // Basic status filter
     const matchesStatus = statusFilter === "all" || parcel.status === statusFilter
-    return matchesSearch && matchesStatus
+
+    // Advanced filters
+    const matchesAdvancedStatus = advancedFilters.status.length === 0 || 
+      advancedFilters.status.includes(parcel.status)
+
+    const matchesAdvancedCourier = advancedFilters.courier.length === 0 || 
+      advancedFilters.courier.includes(parcel.courier)
+
+    const matchesTrackingId = advancedFilters.trackingId === "" || 
+      parcel.trackingId.toLowerCase().includes(advancedFilters.trackingId.toLowerCase())
+
+    const matchesSenderName = advancedFilters.senderName === "" || 
+      parcel.sender.name.toLowerCase().includes(advancedFilters.senderName.toLowerCase())
+
+    const matchesReceiverName = advancedFilters.receiverName === "" || 
+      parcel.receiver.name.toLowerCase().includes(advancedFilters.receiverName.toLowerCase())
+
+    const matchesLocation = advancedFilters.location === "" || 
+      (parcel.currentLocation?.city && parcel.currentLocation.city.toLowerCase().includes(advancedFilters.location.toLowerCase())) ||
+      (parcel.sender.city && parcel.sender.city.toLowerCase().includes(advancedFilters.location.toLowerCase())) ||
+      (parcel.receiver.city && parcel.receiver.city.toLowerCase().includes(advancedFilters.location.toLowerCase()))
+
+    const matchesDateRange = () => {
+      if (!advancedFilters.dateRange.start && !advancedFilters.dateRange.end) return true
+      const parcelDate = new Date(parcel.createdAt)
+      const startDate = advancedFilters.dateRange.start ? new Date(advancedFilters.dateRange.start) : null
+      const endDate = advancedFilters.dateRange.end ? new Date(advancedFilters.dateRange.end) : null
+      if (startDate && parcelDate < startDate) return false
+      if (endDate && parcelDate > endDate) return false
+      return true
+    }
+
+    const matchesWeightRange = () => {
+      if (!advancedFilters.weightRange.min && !advancedFilters.weightRange.max) return true
+      const weight = parseFloat(parcel.weight || "0") || 0
+      const minWeight = parseFloat(advancedFilters.weightRange.min) || 0
+      const maxWeight = parseFloat(advancedFilters.weightRange.max) || Infinity
+      return weight >= minWeight && weight <= maxWeight
+    }
+
+    return matchesSearch && 
+           matchesStatus && 
+           matchesAdvancedStatus && 
+           matchesAdvancedCourier && 
+           matchesTrackingId && 
+           matchesSenderName && 
+           matchesReceiverName && 
+           matchesLocation && 
+           matchesDateRange() && 
+           matchesWeightRange()
   })
+
+  const clearAdvancedFilters = () => {
+    setAdvancedFilters({
+      status: [],
+      courier: [],
+      dateRange: { start: "", end: "" },
+      weightRange: { min: "", max: "" },
+      location: "",
+      senderName: "",
+      receiverName: "",
+      trackingId: ""
+    })
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -137,6 +228,12 @@ export function AdminParcelManager() {
             <p className="text-foreground/70">Manage parcels and schedule updates</p>
           </div>
           <div className="flex gap-3">
+            <ExportButtons 
+              data={filteredParcels} 
+              filename="parcels-export" 
+              type="parcels"
+              className="flex gap-2"
+            />
             <button
               onClick={() => setShowParcelForm(true)}
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg flex items-center gap-2 transition-smooth"
@@ -206,14 +303,24 @@ export function AdminParcelManager() {
           </select>
         </div>
 
+        {/* Advanced Filters */}
+        <AdvancedFilters
+          filters={advancedFilters}
+          onFiltersChange={setAdvancedFilters}
+          onClearFilters={clearAdvancedFilters}
+          className="mb-6"
+        />
+
         {/* Parcels Tab */}
         {activeTab === "parcels" && (
           <div className="grid gap-4">
             {loading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <p className="mt-4 text-foreground/60">Loading parcels...</p>
-              </div>
+              <>
+                <SearchSkeleton />
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <ParcelCardSkeleton key={i} />
+                ))}
+              </>
             ) : filteredParcels.length === 0 ? (
               <div className="text-center py-12">
                 <Package size={48} className="mx-auto text-foreground/20 mb-4" />

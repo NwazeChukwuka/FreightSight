@@ -7,6 +7,7 @@ import parcelRoutes from "./routes/parcels.js"
 import adminRoutes from "./routes/admin.js"
 import scheduledUpdatesRoutes from "./routes/scheduled-updates.js"
 import monitoringRoutes from "./routes/monitoring.js"
+import emailTemplatesRoutes from "./routes/email-templates.js"
 import { authMiddleware } from "./middleware/auth.js"
 import { securityHeaders, ipBlocker, detectSuspiciousActivity, auditLogger, sanitizeInput } from "./middleware/security.js"
 import { apiLimiter, authLimiter, adminLimiter } from "./middleware/rateLimit.js"
@@ -51,6 +52,7 @@ app.use("/api/parcels", authMiddleware, parcelRoutes)
 app.use("/api/admin", authMiddleware, adminRoutes)
 app.use("/api/scheduled-updates", scheduledUpdatesRoutes)
 app.use("/api/monitoring", monitoringRoutes)
+app.use("/api/email-templates", emailTemplatesRoutes)
 
 // Health check with enterprise monitoring
 app.get("/api/health", async (req, res) => {

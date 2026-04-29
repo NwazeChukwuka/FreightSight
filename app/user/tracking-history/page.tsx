@@ -1,10 +1,35 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Loader, Search, Trash2 } from "lucide-react"
+import { Loader, Search, Trash2, Download } from "lucide-react"
+import { ExportButtons } from "@/components/export-buttons"
+import { TrackingHistorySkeleton } from "@/components/skeleton-loader"
+
+interface TrackingHistoryItem {
+  _id: string
+  trackingId: string
+  courier?: string
+  parcelData?: {
+    status?: string
+    sender?: {
+      name?: string
+      email?: string
+    }
+    receiver?: {
+      name?: string
+      email?: string
+    }
+    currentLocation?: {
+      city?: string
+      country?: string
+    }
+    estimatedDelivery?: string
+  }
+  searchedAt: string
+}
 
 export default function TrackingHistoryPage() {
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState<TrackingHistoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -52,7 +77,14 @@ export default function TrackingHistoryPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">Tracking History</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Tracking History</h1>
+        <ExportButtons 
+          data={filteredHistory} 
+          filename="tracking-history" 
+          type="tracking"
+        />
+      </div>
 
       {/* Search Bar */}
       <div className="mb-8">
@@ -69,9 +101,7 @@ export default function TrackingHistoryPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <TrackingHistorySkeleton />
       ) : filteredHistory.length === 0 ? (
         <div className="glass p-12 text-center">
           <p className="text-foreground/60">No tracking history found</p>
