@@ -38,12 +38,12 @@ export default function Home() {
   ]
 
   const partners = [
-    { name: "DHL", color: "bg-red-500" },
-    { name: "FedEx", color: "bg-orange-500" },
-    { name: "UPS", color: "bg-yellow-500" },
-    { name: "USPS", color: "bg-blue-500" },
-    { name: "Aramex", color: "bg-red-600" },
-    { name: "Royal Mail", color: "bg-red-700" }
+    { name: "DHL", logo: "/logos/dhl.png" },
+    { name: "FedEx", logo: "/logos/fedex.png" },
+    { name: "UPS", logo: "/logos/ups.png" },
+    { name: "USPS", logo: "/logos/usps.png" },
+    { name: "Aramex", logo: "/logos/aramex.png" },
+    { name: "Royal Mail", logo: "/logos/royal-mail.png" }
   ]
 
   const stats = [
@@ -241,9 +241,19 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
             {partners.map((partner, idx) => (
               <div key={idx} className="glass p-6 rounded-xl flex items-center justify-center h-24 group hover:scale-105 transition-all duration-300">
-                <div className={`${partner.color} text-white px-4 py-2 rounded-lg font-bold text-lg group-hover:scale-110 transition-transform`}>
-                  {partner.name}
-                </div>
+                <img 
+                  src={partner.logo} 
+                  alt={partner.name}
+                  className="h-12 w-auto object-contain group-hover:scale-110 transition-transform"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    // Fallback to colored box if logo not found
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<div class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-lg">${partner.name}</div>`;
+                    }
+                  }}
+                />
               </div>
             ))}
           </div>

@@ -17,25 +17,25 @@ export default function PartnersPage() {
   })
 
   const currentPartners = [
-    { name: "DHL", color: "bg-red-500", description: "Global express delivery services", regions: "Worldwide", rating: 4.8 },
-    { name: "FedEx", color: "bg-orange-500", description: "International shipping and logistics", regions: "220+ countries", rating: 4.7 },
-    { name: "UPS", color: "bg-yellow-500", description: "Package delivery and supply chain", regions: "220+ countries", rating: 4.6 },
-    { name: "USPS", color: "bg-blue-500", description: "United States postal services", regions: "USA & territories", rating: 4.5 },
-    { name: "Aramex", color: "bg-red-600", description: "Middle East and North Africa", regions: "70+ countries", rating: 4.4 },
-    { name: "Royal Mail", color: "bg-red-700", description: "UK postal and delivery services", regions: "United Kingdom", rating: 4.6 }
+    { name: "DHL", logo: "/logos/dhl.png", description: "Global express delivery services", regions: "Worldwide", rating: 4.8 },
+    { name: "FedEx", logo: "/logos/fedex.png", description: "International shipping and logistics", regions: "220+ countries", rating: 4.7 },
+    { name: "UPS", logo: "/logos/ups.png", description: "Package delivery and supply chain", regions: "220+ countries", rating: 4.6 },
+    { name: "USPS", logo: "/logos/usps.png", description: "United States postal services", regions: "USA & territories", rating: 4.5 },
+    { name: "Aramex", logo: "/logos/aramex.png", description: "Middle East and North Africa", regions: "70+ countries", rating: 4.4 },
+    { name: "Royal Mail", logo: "/logos/royal-mail.png", description: "UK postal and delivery services", regions: "United Kingdom", rating: 4.6 }
   ]
 
   const additionalPartners = [
-    { name: "Canada Post", color: "bg-red-400", description: "Canada's primary postal service" },
-    { name: "Australia Post", color: "bg-yellow-600", description: "Australian postal and logistics" },
-    { name: "Deutsche Post", color: "bg-yellow-400", description: "German postal and DHL Group" },
-    { name: "La Poste", color: "bg-yellow-500", description: "France's postal service" },
-    { name: "Poste Italiane", color: "bg-red-500", description: "Italian postal services" },
-    { name: "Japan Post", color: "bg-red-600", description: "Japan's national postal service" },
-    { name: "China Post", color: "bg-green-600", description: "China's postal service" },
-    { name: "India Post", color: "bg-orange-600", description: "India's postal service" },
-    { name: "Brazil Correios", color: "bg-yellow-700", description: "Brazil's postal service" },
-    { name: "South Africa Post", color: "bg-blue-600", description: "South African postal service" }
+    { name: "Canada Post", logo: "/logos/canada-post.png", description: "Canada's primary postal service" },
+    { name: "Australia Post", logo: "/logos/australia-post.png", description: "Australian postal and logistics" },
+    { name: "Deutsche Post", logo: "/logos/deutsche-post.png", description: "German postal and DHL Group" },
+    { name: "La Poste", logo: "/logos/la-poste.png", description: "France's postal service" },
+    { name: "Poste Italiane", logo: "/logos/poste-italiane.png", description: "Italian postal services" },
+    { name: "Japan Post", logo: "/logos/japan-post.png", description: "Japan's national postal service" },
+    { name: "China Post", logo: "/logos/china-post.png", description: "China's postal service" },
+    { name: "India Post", logo: "/logos/india-post.png", description: "India's postal service" },
+    { name: "Brazil Correios", logo: "/logos/brazil-correios.png", description: "Brazil's postal service" },
+    { name: "South Africa Post", logo: "/logos/south-africa-post.png", description: "South African postal service" }
   ]
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -89,8 +89,21 @@ export default function PartnersPage() {
             {currentPartners.map((partner, idx) => (
               <div key={idx} className="glass rounded-2xl p-6 hover:scale-105 transition-all duration-300">
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`${partner.color} text-white px-4 py-2 rounded-lg font-bold text-lg`}>
-                    {partner.name}
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={partner.logo} 
+                      alt={partner.name}
+                      className="h-8 w-auto object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        // Fallback to colored box if logo not found
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-lg">${partner.name}</div>`;
+                        }
+                      }}
+                    />
+                    <span className="font-bold text-lg">{partner.name}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
@@ -125,8 +138,21 @@ export default function PartnersPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {additionalPartners.map((partner, idx) => (
               <div key={idx} className="glass p-4 rounded-xl text-center hover:scale-105 transition-all duration-300">
-                <div className={`${partner.color} text-white px-3 py-2 rounded-lg font-bold text-sm mb-3`}>
-                  {partner.name}
+                <div className="flex flex-col items-center gap-2 mb-3">
+                  <img 
+                    src={partner.logo} 
+                    alt={partner.name}
+                    className="h-8 w-auto object-contain"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      // Fallback to colored box if logo not found
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="bg-primary text-white px-3 py-2 rounded-lg font-bold text-sm">${partner.name}</div>`;
+                      }
+                    }}
+                  />
+                  <span className="font-bold text-sm">{partner.name}</span>
                 </div>
                 <p className="text-xs text-foreground/70">{partner.description}</p>
               </div>
